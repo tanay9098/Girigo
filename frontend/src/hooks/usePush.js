@@ -1,25 +1,53 @@
 import { useState, useEffect } from "react";
+import { getVapidPublicKey, savePushSubscription } from "../lib/api.js";
 
-export function useCountdown(expiresAt) {
-  const [timeLeft, setTimeLeft] = useState(null);
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+}
+
+export function usePushNotifications() {
+  const isSupported = "serviceWorker" in navigator && "PushManager" in window;
+
+  const [permission, setPermission] = useState(
+    isSupported ? Notification.permission : "denied"
+  );
+  const [subscription, setSubscription] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!expiresAt) return;
-    function calculate() {
-      const diff = new Date(expiresAt).getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft({ hours:0, minutes:0, seconds:0, expired:true, raw:0 }); return; }
-      setTimeLeft({
-        hours:   Math.floor(diff / 3600000),
-        minutes: Math.floor((diff % 3600000) / 60000),
-        seconds: Math.floor((diff % 60000) / 1000),
-        expired: false,
-        raw: diff,
-      });
-    }
-    calculate();
-    const id = setInterval(calculate, 1000);
-    return () => clearInterval(id);
-  }, [expiresAt]);
+    if (!isSupported) return;
+    navigator.serviceWorker.ready.then((reg) =>
+      reg.pushManager.getSubscription().then(setSubscription)
+    );
+  }, [isSupported]);
 
-  return timeLeft;
+  async function subscribe() {
+    setLoading(true);
+    setError(null);
+    try {
+      const perm = await Notification.requestPermission();
+      setPermission(perm);
+      if (perm !== "granted") return;
+
+      const reg = await navigator.serviceWorker.ready;
+      const vapidKey = await getVapidPublicKey();
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+
+      await savePushSubscription(sub.toJSON());
+      setSubscription(sub);
+    } catch (err) {
+      setError(err.message || "Failed to enable notifications");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return { isSupported, permission, subscription, loading, error, subscribe };
 }
