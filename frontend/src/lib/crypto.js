@@ -1,3 +1,9 @@
+/**
+ * Client-side AES-256-GCM encryption using the Web Crypto API.
+ * Works for both text (wish) and binary (video blob).
+ * Key is derived from user's password using PBKDF2 (310,000 iterations).
+ */
+
 const ALGO = "AES-GCM";
 const KEY_LENGTH = 256;
 const PBKDF2_ITERATIONS = 310_000;
@@ -23,20 +29,41 @@ async function deriveKey(password, salt) {
   );
 }
 
-export async function encryptWish(wish, password) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv   = crypto.getRandomValues(new Uint8Array(12));
-  const key  = await deriveKey(password, salt);
-  const ciphertext = await crypto.subtle.encrypt(
-    { name: ALGO, iv }, key, new TextEncoder().encode(wish)
+/**
+ * Encrypt a video Blob in the browser.
+ * @param {Blob} videoBlob    Recorded video blob from MediaRecorder
+ * @param {string} password   User's password
+ * @returns {{ encryptedBuffer: ArrayBuffer, iv: string, salt: string }}
+ */
+export async function encryptVideo(videoBlob, password) {
+  const salt      = crypto.getRandomValues(new Uint8Array(16));
+  const iv        = crypto.getRandomValues(new Uint8Array(12));
+  const key       = await deriveKey(password, salt);
+  const videoData = await videoBlob.arrayBuffer(); // Blob → ArrayBuffer
+
+  const encryptedBuffer = await crypto.subtle.encrypt(
+    { name: ALGO, iv }, key, videoData
   );
-  return { encryptedWish: toBase64(ciphertext), iv: toBase64(iv), salt: toBase64(salt) };
+
+  return {
+    encryptedBuffer, // ArrayBuffer — send as binary
+    iv:   toBase64(iv),
+    salt: toBase64(salt),
+  };
 }
 
-export async function decryptWish(encryptedWish, iv, salt, password) {
+/**
+ * Decrypt a video back to a Blob (for user playback only).
+ * @param {ArrayBuffer} encryptedBuffer
+ * @param {string} iv     base64
+ * @param {string} salt   base64
+ * @param {string} password
+ * @returns {Blob} playable video blob
+ */
+export async function decryptVideo(encryptedBuffer, iv, salt, password) {
   const key = await deriveKey(password, fromBase64(salt));
-  const plaintext = await crypto.subtle.decrypt(
-    { name: ALGO, iv: fromBase64(iv) }, key, fromBase64(encryptedWish)
+  const decrypted = await crypto.subtle.decrypt(
+    { name: ALGO, iv: fromBase64(iv) }, key, encryptedBuffer
   );
-  return new TextDecoder().decode(plaintext);
+  return new Blob([decrypted], { type: "video/webm" });
 }
