@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 
-const BASE = import.meta.env.VITE_BACKEND_URL;
+const BASE = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
 
 async function authHeaders(includeContentType = true) {
   const { data: { session } } = await supabase.auth.getSession();
