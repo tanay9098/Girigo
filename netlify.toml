@@ -1,0 +1,10 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback so client-side routes don't return Netlify's 404 HTML
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
