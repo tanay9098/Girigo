@@ -8,11 +8,25 @@ import { authMiddleware } from "./middleware/auth.js";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+const stripTrailingSlash = (url) => url.replace(/\/+$/, "");
+
+const allowedOrigins =
+  process.env.NODE_ENV === "development"
+    ? ["http://localhost:5173", "http://localhost:5174"]
+    : (process.env.FRONTEND_URL || "")
+        .split(",")
+        .map((o) => stripTrailingSlash(o.trim()))
+        .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "development"
-      ? ["http://localhost:5173", "http://localhost:5174"]
-      : process.env.FRONTEND_URL,
+    origin(origin, callback) {
+      // Allow non-browser requests (no Origin header) and configured origins.
+      if (!origin || allowedOrigins.includes(stripTrailingSlash(origin))) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
   })
 );
