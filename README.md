@@ -1,6 +1,6 @@
 # 기리고 — Girigo
 
-A full-stack web app for making wishes. Record your wish as a video, seal it with a password, and get notified 24 hours later that your wish has been granted.
+A wish making application inspired from Kdrama if wishes could kill.
 
 **Privacy first** — your video is encrypted in the browser using AES-256-GCM before it ever leaves your device. The server only stores ciphertext; it can never see your wish.
 
