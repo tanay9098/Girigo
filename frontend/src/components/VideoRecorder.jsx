@@ -105,7 +105,7 @@ export default function VideoRecorder({ onVideoReady }) {
       {/* ── STOPPED: playback + confirm ─────────────────────────────── */}
       {state === "stopped" && videoUrl && (
         <div className="recorder-preview">
-          <p className="recorder-hint">Review your wish before submitting:</p>
+          <p className="recorder-granted">Your wish will be granted.</p>
 
           <video
             ref={previewVideoRef}
