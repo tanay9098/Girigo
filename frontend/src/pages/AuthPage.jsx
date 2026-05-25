@@ -16,7 +16,7 @@ export default function AuthPage() {
       if (mode === "register") {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setMessage("Check your email to confirm, then sign in.");
+        setMessage("Check your mail from supabase to verify and continue with login. If you are unable to see it, then check your spam folder on your mail");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
