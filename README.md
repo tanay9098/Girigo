@@ -1,8 +1,5 @@
 
-A wish making application inspired from Kdrama if wishes could kill.
-
-**Privacy# 기리고 — Girigo
- first** — your video is encrypted in the browser using AES-256-GCM before it ever leaves your device. The server only stores ciphertext; it can never see your wish.
+A wish making application inspired from Kdrama, "If wishes could kill."
 
 ---
 
@@ -10,7 +7,7 @@ A wish making application inspired from Kdrama if wishes could kill.
 
 1. Sign in with email and password
 2. Record your wish via webcam
-3. Set a seal password (used to encrypt the video locally)
+3. Set a seal password 
 4. Submit — the encrypted video is uploaded and a 24-hour countdown begins
 5. After 24 hours, you receive a push notification: your wish is granted
 
@@ -56,7 +53,7 @@ Girigo/
 
 - Node.js 20+
 - A [Supabase](https://supabase.com) project
-- A Redis instance (local or [Upstash](https://upstash.com) free tier)
+- A Redis instance 
 
 ---
 
@@ -174,9 +171,9 @@ The app will be available at `http://localhost:5173`.
 
 ---
 
-## Security notes
+## Security Features
 
-- Videos are encrypted **in the browser** before upload — the server only receives ciphertext
+- Videos are encrypted **in the browser** before upload  using AES-256-GCM. The server only stores ciphertext and it can never see your wish.
 - The seal password is never sent to the server
 - Supabase Row Level Security (RLS) ensures users can only access their own data
 - Storage paths are scoped per user: `wishes/{userId}/{wishId}.bin`
