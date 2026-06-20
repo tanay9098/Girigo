@@ -13,16 +13,15 @@ A wish making application inspired from Kdrama, "If wishes could kill."
 
 ---
 
-## Tech stack
+## Tech stacks used 🤖
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite, PWA (Workbox) |
-| Backend | Node.js, Express 5 |
-| Database | Supabase (PostgreSQL + Storage + Auth) |
-| Job queue | BullMQ + Redis |
-| Push notifications | Web Push API (VAPID) |
-| Encryption | Web Crypto API — AES-256-GCM, PBKDF2 (310k iterations) |
+| Smart Contracts | Solidity 0.8.25, Hardhat, OpenZeppelin v5 |
+| Blockchain | Polygon (Amoy Testnet / Mainnet) |
+| Web Frontend | React 19, TypeScript, Vite 5, ethers.js v6 |
+| Mobile App | Expo ~54, React Native 0.81, Expo Router |
+| Data | PokéAPI (pokemon data), Pinata (IPFS metadata; planned for future release) |
 
 ---
 
