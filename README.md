@@ -1,6 +1,9 @@
 
 A wish making application inspired from Kdrama, "If wishes could kill."
 
+**Detailed Blog:** https://dev.to/tanay_dwivedi9098/i-developed-an-app-that-can-kll-you-2oad
+**Live app:** https://girigofrontend.netlify.app/
+
 ---
 
 ## How it works
